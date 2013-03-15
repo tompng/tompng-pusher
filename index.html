@@ -15,7 +15,7 @@ function load(){
 onload=function(){
   load();
   setInterval(load,30*1000);
-  document.getElement
+  renderAll()
 }
 var VIEWHOUR=1
 function onData(data){
@@ -106,13 +106,13 @@ function render(info){
     g.strokeStyle=color.dark
     g.stroke();
     g.beginPath();
-    g.moveTo(x+5,y-10);
+    g.moveTo(x-5,y-10);
+    g.lineTo(x+0,y-30);
+    g.lineTo(x-50,y-30);
+    g.lineTo(x-50,y-80);
+    g.lineTo(x+30,y-80);
+    g.lineTo(x+30,y-30);
     g.lineTo(x+10,y-30);
-    g.lineTo(x-30,y-30);
-    g.lineTo(x-30,y-80);
-    g.lineTo(x+50,y-80);
-    g.lineTo(x+50,y-30);
-    g.lineTo(x+20,y-30);
     g.closePath();
     g.fillStyle='white'
     g.strokeStyle='silver'
@@ -122,11 +122,11 @@ function render(info){
     g.fillStyle='black'
     var text=info.label
     var w=g.measureText(text).width;
-    g.fillText(text,x+10-w/2,y-58)
+    g.fillText(text,x-10-w/2,y-58)
     var v10=Math.round(near.value*10);
     var text=(v10/10|0)+"."+v10%10+info.unit
     var w=g.measureText(text).width;
-    g.fillText(text,x+10-w/2,y-35)
+    g.fillText(text,x-10-w/2,y-35)
   }
 }
 </script>
