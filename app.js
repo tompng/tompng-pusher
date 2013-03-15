@@ -10,7 +10,7 @@ function setWakeup(host,interval){
     request.get({uri:'http://'+host+path+'?'+Math.random()});
   },interval)
 }
-setWakeup("localhost:3000",10*60*1000);
+setWakeup("fierce-beach-8052.herokuapp.com",10*60*1000);
 
 setInterval(function(){
   var option={uri:'http://housedata.herokuapp.com/?'+Math.random()}
