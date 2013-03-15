@@ -1,0 +1,171 @@
+<script>
+var time=0;
+
+var dataArray=[];
+function load(){
+  var http=new XMLHttpRequest();
+  http.open("GET","/data?time="+time,true);
+  http.onreadystatechange=function(){
+    if(http.readyState!=4)return;
+    if(http.status==200)onData(JSON.parse(http.responseText));
+  }
+  http.send();
+}
+
+onload=function(){
+  load();
+  setInterval(load,30*1000);
+  document.getElement
+}
+var VIEWHOUR=1
+function onData(data){
+  if(data.length==0)return;
+  for(var i=0;i<data.length;i++)dataArray.push(data[i]);
+  time=dataArray[dataArray.length-1].time;
+  while(dataArray[0].time<time-24*60*60*1000)dataArray.shift();
+  renderAll()
+}
+humGraph={key:'hum',min:0,max:100,color:{main:'blue',light:'#aaf',dark:'#00a'},label:'湿度',unit:'%'}
+tempGraph={key:'temp',min:10,max:35,color:{main:'red',light:'#faa',dark:'#a00'},label:'温度',unit:'℃'}
+
+
+function renderAll(){
+  document.getElementById('hbtn').className='h'+VIEWHOUR
+  render(humGraph)
+  render(tempGraph)
+}
+function render(info){
+  var min=info.min,max=info.max;
+  var color=info.color;
+  var canvas=document.getElementById(info.key);
+  var mouse=canvas.mouse;
+  var w=canvas.width,h=canvas.height;
+  var g=canvas.getContext('2d');
+  g.lineWidth=1;
+  g.font='20px sans-serif'
+  g.strokeStyle='black'
+  g.clearRect(0,0,w,h);
+  g.lineWidth=0.1;
+  
+  var dy=(max-min>100)?40:(max-min>=50)?20:(max-min>=40)?10:(max-min>=20)?5:2;
+  for(var y=Math.ceil(min/dy)*dy;y<=max;y+=dy){
+    g.beginPath();
+    var yy=0.05*h+0.85*h*(1-(y-min)/(max-min));
+    g.moveTo(0.1*w,yy);
+    g.lineTo(0.95*w,yy);
+    var text=y+info.unit
+    var x=0.1*w-g.measureText(text).width-20
+    g.fillText(text,x<0?0:x,yy+10)
+    g.stroke();
+  }
+  g.lineWidth=1
+  g.beginPath()
+  g.moveTo(0.1*w,0.9*h)
+  g.lineTo(0.95*w,0.9*h)
+  g.stroke()
+
+  for(var t=0;t<=VIEWHOUR;t+=(VIEWHOUR<4?1:VIEWHOUR<8?2:4)){
+    var text=t+'h'
+    g.fillText(text,0.1*w+0.85*w*(1-t/VIEWHOUR)-g.measureText(text).width/2,0.9*h+40)
+    g.stroke();
+  }
+
+
+
+  g.beginPath();
+  var near=null;
+  var flag=false;
+  for(var i=0;i<dataArray.length;i++){
+    var data=dataArray[i];
+    var t=(time-data.time)/VIEWHOUR/60/60/1000
+    if(t>1)continue;
+    var value=data[info.key];
+    var x=0.1*w+0.85*(1-t)*w;
+    var y=0.05*h+0.85*h*(1-(value-min)/(max-min));
+    if(mouse){
+      var dif=(mouse.x-x)*(mouse.x-x)+(mouse.y-y)*(mouse.y-y);
+      var r=50
+      if(dif<r*r&&(!near||dif<near.dif))
+        near={x:x,y:y,value:value,time:t*60*VIEWHOUR,dif:dif}
+    }
+    console.log(value,y);
+    if(!flag)g.moveTo(x,y);
+    else g.lineTo(x,y);
+    flag=true;
+  }
+  g.lineWidth=4
+  g.strokeStyle=color.main
+  g.stroke();
+
+  if(near){
+    var x=near.x,y=near.y
+    g.beginPath();
+    g.arc(x,y,4,0,2*Math.PI,true);
+    g.fillStyle=color.main
+    g.fill();
+    g.strokeStyle=color.dark
+    g.stroke();
+    g.beginPath();
+    g.moveTo(x+5,y-10);
+    g.lineTo(x+10,y-30);
+    g.lineTo(x-30,y-30);
+    g.lineTo(x-30,y-80);
+    g.lineTo(x+50,y-80);
+    g.lineTo(x+50,y-30);
+    g.lineTo(x+20,y-30);
+    g.closePath();
+    g.fillStyle='white'
+    g.strokeStyle='silver'
+    g.lineWidth=1
+    g.fill();
+    g.stroke();
+    g.fillStyle='black'
+    var text=info.label
+    var w=g.measureText(text).width;
+    g.fillText(text,x+10-w/2,y-58)
+    var v10=Math.round(near.value*10);
+    var text=(v10/10|0)+"."+v10%10+info.unit
+    var w=g.measureText(text).width;
+    g.fillText(text,x+10-w/2,y-35)
+  }
+}
+</script>
+
+<style>
+nobr span{
+  font-size:24px;
+  margin:10px;
+  border-radius:4px;
+  box-shadow:0 0 4px silver;
+  padding:2px 4px;
+}
+nobr.h1 span.h1,nobr.h6 span.h6,nobr.h24 span.h24{
+  background:silver;
+}
+nobr span:hover{
+  background:#eee;
+}
+h1{
+  margin:50 0 0 0;
+  padding:0;
+}
+div.graph{
+  width:600px;
+  float:left;
+}
+</style>
+<center>
+<nobr class='h1' id='hbtn'>
+<span onclick="VIEWHOUR=1;renderAll()" class='h1'>1時間</span>
+<span onclick="VIEWHOUR=6;renderAll()" class='h6'>6時間</span>
+<span onclick="VIEWHOUR=24;renderAll()" class='h24'>24時間</span>
+</nobr>
+</center>
+<div class='graph'>
+<h1>湿度</h1>
+<canvas width=600 height=600 id='hum' onmousemove="this.mouse={x:event.offsetX,y:event.offsetY};render(humGraph)"; onmouseout="mouse=null;render(humGraph)"></canvas>
+</div>
+<div class='graph'>
+<h1>温度</h1>
+<canvas width=600 height=600 id='temp' onmousemove="this.mouse={x:event.offsetX,y:event.offsetY};render(tempGraph)"; onmouseout="mouse=null;render(tempGraph)"></canvas>
+</div>
