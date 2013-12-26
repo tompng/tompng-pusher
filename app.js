@@ -18,6 +18,7 @@ io.sockets.on('connection',function(socket){
   socket.emit('join',{id:id,count:count});
   socket.on('message',function(data){
     socket.broadcast.emit('message',{id:id,message:data});
+    socket.emit('message',{id:id,message:data});
   });
   socket.on('disconnect',function(){
     count--;
