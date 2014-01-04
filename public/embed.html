@@ -1,0 +1,12 @@
+<script>
+var PUSHER_ENDPOINT='<%= Pusher::ENDPOINT %>'
+var PUSHER_GROUPS=<%= Pusher.listen current_user, current_user.some_group %>;
+window.addEventListener('load',function(){
+  var ss=['socket.io/socket.io.js','pusher.js'];
+  for(i in ss){
+    var d=document;s=d.createElement('script');
+    s.src='http://'+PUSHER_ENDPOINT+'/'+ss[i];
+    d.body.appendChild(s);
+  }
+});
+</script>
