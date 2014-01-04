@@ -21,8 +21,14 @@ onload=function(){
 
 <h1>how to use</h1>
 <textarea>
+#lib/pusher.rb
+
+#config/application.rb
+config.autoload_paths << "#{config.root}/lib"
+
 #configure
 Pusher.SECRET_KEY='your_secret_key'
+ENV['PUSHER_SECRET_KEY']='your_secret_key'
 
 #send
 Pusher.send data
@@ -30,3 +36,4 @@ Pusher.send data, 'key'
 Pusher.send data, current_user
 Pusher.send data, [user1, user2, Post.first, user3.group]
 </textarea>
+
