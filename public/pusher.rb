@@ -2,7 +2,7 @@ require 'json'
 require 'digest/sha2'
 require 'net/http'
 module Pusher
-  ENDPOINT = 'fierce-beach-8052.herokuapp.com'
+  ENDPOINT = 'fierce-beach-8052.herokuapp.com:80'
   class << self
     attr_writer :SECRET_KEY
     def SECRET_KEY
