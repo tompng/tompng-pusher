@@ -1,6 +1,6 @@
 <script>
-var PUSHER_ENDPOINT='<%= Pusher::ENDPOINT %>'
-var PUSHER_GROUPS=<%= Pusher.listen current_user %>;
+var PUSHER_ENDPOINT='<%== Pusher::ENDPOINT %>'
+var PUSHER_GROUPS=<%== Pusher.listen current_user %>;
 window.addEventListener('load',function(){
   var ss=['socket.io/socket.io.js','pusher.js'];
   for(i in ss){
