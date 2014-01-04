@@ -31,6 +31,7 @@ io.sockets.on('connection',function(socket){
       var clients=groups[key];
       var idx=clients.indexOf(socket);
       if(idx>=0)clients.splice(idx,1);
+      if(clients.length==0)delete groups[key];
     }
   });
 });
