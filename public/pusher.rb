@@ -2,33 +2,53 @@ require 'json'
 require 'digest/sha2'
 require 'net/http'
 module Pusher
-  ENDPOINT = 'fierce-beach-8052.herokuapp.com:80'
+  ENDPOINT = '<%= ENDPOINT_HOST %>:<%= ENDPOINT_PORT %>'
   class << self
     attr_writer :SECRET_KEY
     def SECRET_KEY
       @SECRET_KEY || ENV['PUSHER_SECRET_KEY'] || (@RAND_KEY||=rand)
     end
 
-    def send data, models=nil
-      models = [models] unless models.is_a? Array
+    def send data, arg
+      version = Time.now.strftime '%s%L'
       query = {
-        keys: models.map{|m|group_id m}.to_json,
+        keys: model_versions(arg).map{|m, v|[group_id(m), v.to_s]}.to_json,
         data: data.to_json
       }
       Net::HTTP.new(*ENDPOINT.split(':')).post('/', URI.encode_www_form(query))
     end
 
-    def group_id model
-      if model.respond_to? :id
-        key = "#{model.class.name}_#{model.id}"
-      else
-        key = model.to_s
-      end
-      "#{self.SECRET_KEY}_#{key}"
+    def listen arg
+      model_versions(arg).map{|m, v|
+        [Digest::SHA2.hexdigest(group_id(m)), v.to_s]
+      }.to_json
     end
 
-    def listen *models
-      models.push(nil).map{|model|Digest::SHA2.hexdigest group_id(model)}.to_json
+    private
+
+    def group_id model
+      name = model.class.name
+      key = model.respond_to?(:id) ? model.id : model
+      Digest::SHA2.hexdigest "#{self.SECRET_KEY}_#{name}_#{key}"
     end
+
+    def model_versions arg
+      if arg.is_a? Hash
+        version = arg[:version]
+        model = arg[:model]
+        models = arg[:models]
+      else
+        model = arg
+      end
+      version ||= Time.now.strftime '%s%L'
+      if models.is_a? Array
+        models.map{|m|[m, version]}
+      elsif models.is_a? Hash
+        models
+      else
+        [[model, version]]
+      end
+    end
+
   end
 end

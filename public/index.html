@@ -9,7 +9,10 @@ onload=function(){
     var textarea=textareas[i];
     var src=textarea.getAttribute('data-src');
     var http=new XMLHttpRequest();http.open('GET',src,false);http.send();
-    textarea.value=http.responseText;
+    var text=http.responseText;
+    text=text.replace('<%= ENDPOINT_HOST %>',location.hostname);
+    text=text.replace('<%= ENDPOINT_PORT %>',location.port||80);
+    textarea.value=text;
   }
 }
 </script>
@@ -34,6 +37,6 @@ ENV['PUSHER_SECRET_KEY']='your_secret_key'
 Pusher.send data
 Pusher.send data, 'key'
 Pusher.send data, current_user
-Pusher.send data, [user1, user2, Post.first, user3.group]
+Pusher.send data, [user1, user2, Post.first]
 </textarea>
 
