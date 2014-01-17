@@ -25,7 +25,7 @@ io.sockets.on('connection',function(socket){
       var version=key_versions[i][1];
       var group=groups[gid];
       if(!group)group=groups[gid]=new Group(gid,groups);
-      leavers.push(group.join(function(data){socket.emit('data',data);},version));
+      leavers.push(group.join(function(data,version){socket.emit('data',{data:data,version:version});},version));
     }
   });
   socket.on('disconnect',function(){
@@ -83,7 +83,8 @@ Group.prototype.join=function(dataCallback,version){
     }
   }
   for(var i=startFrom;i<this.buffer.length;i++){
-    dataCallback(this.buffer[i].data);
+    var obj=this.buffer[i];
+    dataCallback(obj.data,obj.version);
   }
   var self=this;
   return function(){
@@ -103,7 +104,7 @@ Group.prototype.checkDestroy=function(){
 Group.prototype.send=function(data,version){
   this.buffer.push({data:data,version:version,time:new Date()});
   for(var i=0;i<this.listeners.length;i++){
-    this.listeners[i].callback(data);
+    this.listeners[i].callback(data,version);
   }
   if(this.buffer.length==1){
     this.setBufferTimer();

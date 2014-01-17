@@ -1,6 +1,6 @@
 
 <style>
-textarea{width:400px;height:200px;}
+textarea{width:600px;height:200px;}
 </style>
 <script>
 onload=function(){
@@ -16,7 +16,7 @@ onload=function(){
   }
 }
 </script>
-<h1><a href="pusher.rb">pusher.rb</a></h1>
+<h1>pusher.rb</h1>
 <textarea data-src='pusher.rb'></textarea>
 
 <h1>embed code</h1>
@@ -39,5 +39,10 @@ Pusher.send data, to: current_user
 Pusher.send data, to: model, version: model.version
 Pusher.send data, to: hoge.posts, version: hoge.updated_at
 Pusher.send data, to: {user1 => user1.updated_at, user2 => user2.updated_at}
+
+#receive
+window.onpusherdata = function(data, version){
+  console.log(data, version);
+}
 </textarea>
 
