@@ -10,7 +10,6 @@ module Pusher
     end
 
     def send data, dst
-      version = Time.now.strftime '%s%L'
       query = {
         keys: key_versions(dst).to_json,
         data: data.to_json
