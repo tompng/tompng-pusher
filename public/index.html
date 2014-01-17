@@ -34,9 +34,10 @@ Pusher.SECRET_KEY='your_secret_key'
 ENV['PUSHER_SECRET_KEY']='your_secret_key'
 
 #send
-Pusher.send data
-Pusher.send data, 'key'
-Pusher.send data, current_user
-Pusher.send data, [user1, user2, Post.first]
+Pusher.send data, to: 'key'
+Pusher.send data, to: current_user
+Pusher.send data, to: model, version: model.version
+Pusher.send data, to: hoge.posts, version: hoge.updated_at
+Pusher.send data, to: {user1 => user1.updated_at, user2 => user2.updated_at}
 </textarea>
 

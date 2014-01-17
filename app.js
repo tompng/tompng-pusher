@@ -41,6 +41,7 @@ app.post('/',function(req,res){
   var keys=JSON.parse(req.body.keys);
   var data=JSON.parse(req.body.data);
   for(var i=0;i<keys.length;i++){
+    console.log('key',keys[i][0])
     var gid='#'+sha2(keys[i][0]);
     var version=keys[i][1];
     var group=groups[gid];
@@ -56,6 +57,7 @@ process.on('uncaughtException',function(err){
 
 Group.TIMEOUT=30*1000;
 function Group(groupID,groupHash){
+  console.log('group gen',groupID)
   this.groupID=groupID;
   this.groupHash=groupHash;
   this.listeners=[];
@@ -74,7 +76,7 @@ Group.prototype.join=function(dataCallback,version){
   var startFrom=0;
   if(version){
     for(var i=this.buffer.length-1;i>=0;i--){
-      if(this.buffer[i].version==version){
+      if(this.buffer[i].version<=version){
         startFrom=i+1;
         break;
       }
@@ -95,6 +97,7 @@ Group.prototype.join=function(dataCallback,version){
 Group.prototype.checkDestroy=function(){
   if(this.listeners.length==0&&this.buffer.length==0){
     delete this.groupHash[this.groupID];
+    console.log('group destroy',this.groupID)
   }
 }
 Group.prototype.send=function(data,version){
