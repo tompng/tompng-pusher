@@ -73,17 +73,9 @@ Group.prototype.join=function(dataCallback,version){
   var self=this;
   var node={callback:dataCallback,index:this.listeners.length};
   this.listeners[node.index]=node;
-  var startFrom=0;
-  if(version){
-    for(var i=this.buffer.length-1;i>=0;i--){
-      if(this.buffer[i].version<=version){
-        startFrom=i+1;
-        break;
-      }
-    }
-  }
-  for(var i=startFrom;i<this.buffer.length;i++){
+  for(var i=0;i<this.buffer.length;i++){
     var obj=this.buffer[i];
+    if(version&&obj.version<=version)continue;
     dataCallback(obj.data,obj.version);
   }
   var self=this;
