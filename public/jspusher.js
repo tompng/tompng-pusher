@@ -18,7 +18,6 @@ var Pusher={};
         if(Pusher.onerror)Pusher.onerror();
         return;
       }
-      if(Pusher.onconnect)Pusher.onconnect();
       var socket=io.connect('http://'+PUSHER_ENDPOINT+'/');
       socket.on('connect',function(){
         socket.emit('init',[recvKey]);
