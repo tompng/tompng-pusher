@@ -21,12 +21,19 @@ io.sockets.on('connection',function(socket){
     if(key_versions)return;
     key_versions=data;
     for(var i=0;i<key_versions.length;i++){
-      var gid='#'+key_versions[i][0];
-      var version=key_versions[i][1];
+      var gid,version;
+      if(key_versions[i] instanceof Array){
+        gid='#'+key_versions[i][0];
+        version=key_versions[i][1];
+      }else{
+        gid='#'+key_versions[i];  
+      }
+      console.log('recv gid:',gid);
       var group=groups[gid];
       if(!group)group=groups[gid]=new Group(gid,groups);
       leavers.push(group.join(function(data,version){socket.emit('data',{data:data,version:version});},version));
     }
+    socket.emit('started');
   });
   socket.on('disconnect',function(){
     for(var i=0;i<leavers.length;i++){
@@ -35,15 +42,32 @@ io.sockets.on('connection',function(socket){
   });
 });
 
-var lastdata=0;
+function allow(res){
+  res.header('Access-Control-Allow-Methods','*');
+  res.header('Access-Control-Allow-Headers','X-Requested-With');
+  res.header('Access-Control-Allow-Origin','*');
+}
+app.options('/',function(req,res){allow(res);res.end();});
+
 app.post('/',function(req,res){
-  lastdata++;
+  allow(res);
+  if(req.body.key){
+    res.end(sha2(JSON.parse(req.body.key)));
+    return;
+  }
   var keys=JSON.parse(req.body.keys);
   var data=JSON.parse(req.body.data);
   for(var i=0;i<keys.length;i++){
-    console.log('key',keys[i][0])
-    var gid='#'+sha2(keys[i][0]);
-    var version=keys[i][1];
+    console.log('key',keys[i]);
+    var key,version;
+    if(keys[i] instanceof Array){
+      key=keys[i][0];
+      version=keys[i][1];
+    }else{
+      key=keys[i];
+    }
+    var gid='#'+sha2(key);
+    console.log('send gid:',gid);
     var group=groups[gid];
     if(!group)group=groups[gid]=new Group(gid,groups);
     group.send(data,version);
@@ -75,7 +99,7 @@ Group.prototype.join=function(dataCallback,version){
   this.listeners[node.index]=node;
   for(var i=0;i<this.buffer.length;i++){
     var obj=this.buffer[i];
-    if(version&&obj.version<=version)continue;
+    if(!version||obj.version<=version)continue;
     dataCallback(obj.data,obj.version);
   }
   var self=this;

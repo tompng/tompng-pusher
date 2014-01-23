@@ -1,0 +1,12 @@
+<script>var PUSHER_ENDPOINT='<%= ENDPOINT_HOST %>:<%= ENDPOINT_PORT %>'</script>
+<script src='http://<%= ENDPOINT_HOST %>:<%= ENDPOINT_PORT %>/socket.io/socket.io.js'></script>
+<script src='http://<%= ENDPOINT_HOST %>:<%= ENDPOINT_PORT %>/jspusher.js'></script>
+#init
+Pusher.init('public_key')
+
+#send
+Pusher.send({x:1,y:2})
+
+#recv
+Pusher.ondata=function(data){console.log(data)}
+

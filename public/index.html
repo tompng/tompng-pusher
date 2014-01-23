@@ -10,8 +10,8 @@ onload=function(){
     var src=textarea.getAttribute('data-src');
     var http=new XMLHttpRequest();http.open('GET',src,false);http.send();
     var text=http.responseText;
-    text=text.replace('<%= ENDPOINT_HOST %>',location.hostname);
-    text=text.replace('<%= ENDPOINT_PORT %>',location.port||80);
+    text=text.replace(/<%= ENDPOINT_HOST %>/g,location.hostname);
+    text=text.replace(/<%= ENDPOINT_PORT %>/g,location.port||80);
     textarea.value=text;
   }
 }
@@ -22,7 +22,7 @@ onload=function(){
 <h1>embed code</h1>
 <textarea data-src='embed.html'></textarea>
 
-<h1>how to use</h1>
+<h1>how to use(from rails)</h1>
 <textarea>
 #lib/pusher.rb
 
@@ -46,3 +46,6 @@ window.onpusherdata = function(data, version){
 }
 </textarea>
 
+<hr>
+<h1>how to use(from frontend)</h1>
+<textarea data-src='jscode.html'></textarea>

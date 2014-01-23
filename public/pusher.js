@@ -3,7 +3,7 @@
     setTimeout(arguments.callee,100);
     return;
   }
-  socket=io.connect('http://'+PUSHER_ENDPOINT+'/');
+  var socket=io.connect('http://'+PUSHER_ENDPOINT+'/');
   socket.on('connect',function(){
     socket.emit('init',PUSHER_GROUPS);
   });
